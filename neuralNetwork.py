@@ -68,3 +68,18 @@ class NeuralNetwork:
         self.gradient_weights_input_hidden = gradient_weights_input_hidden
         self.gradient_bias_output = gradient_bias_output
         self.gradient_bias_hidden = gradient_bias_hidden
+
+    def adaptive_learning_rate(self, initial_learning_rate, gradient, epsilon=1e-8):
+        # adaptive learning rate based on the magnitude of the gradient(slope) - CHATGPT
+        return initial_learning_rate / (np.sqrt(np.sum(np.square(gradient))) + epsilon)
+    
+    def gradient_descent(self, learning_rate):
+        # store adaptive learning rates
+        adaptive_lr_input_hidden = self.adaptive_learning_rate(learning_rate, self.gradient_weights_input_hidden)
+        adaptive_lr_hidden_output = self.adaptive_learning_rate(learning_rate, self.gradient_weights_hidden_output)
+    
+        # adjust weights and biases based on learning rate and gradients
+        self.weights_hidden_output -= adaptive_lr_hidden_output * self.gradient_weights_hidden_output
+        self.weights_input_hidden -= adaptive_lr_input_hidden *self.gradient_weights_input_hidden
+        self.bias_hidden -= adaptive_lr_input_hidden * self.gradient_bias_hidden
+        self.bias_output -= adaptive_lr_hidden_output * self.gradient_bias_output
