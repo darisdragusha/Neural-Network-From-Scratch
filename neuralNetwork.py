@@ -128,3 +128,41 @@ class NeuralNetwork:
         self.weights_hidden_output = data['weights_hidden_output']
         self.bias_hidden = data['bias_hidden']
         self.bias_output = data['bias_output']
+
+    def evaluate(self, test_images, test_labels):
+        # Get predictions for the test set
+        predictions = self.predict(test_images)  # This will return the predicted class indices
+
+        # Calculate accuracy
+        accuracy = np.mean(predictions == test_labels)  # Compare predicted classes with true labels
+
+        # Optionally calculate loss if you have a loss function defined
+        # If you're using one-hot encoding for test_labels, ensure to adjust this part
+        test_labels_one_hot = self.one_hot_encode(test_labels, num_classes=10)
+        loss = self.cross_entropy_loss(test_labels_one_hot, self.predict_proba(test_images))
+
+        return loss, accuracy
+
+    def one_hot_encode(self, y, num_classes):
+        return np.eye(num_classes)[y]
+    def predict(self, X):
+        # Forward pass to get the output probabilities
+        output = self.feedforward(X)
+        # Get the predicted class by finding the index of the maximum value in each output
+        predicted_classes = np.argmax(output, axis=1)
+
+        return predicted_classes
+
+    def predict_proba(self, X):
+        """
+        Get the predicted probabilities for each class.
+
+        Parameters:
+        - X: Input data (shape: num_samples x input_size)
+
+        Returns:
+        - output: Probabilities for each class (shape: num_samples x num_classes)
+        """
+        # Forward pass to get the output probabilities
+        output = self.feedforward(X)  # This should give the output of the last layer (before argmax)
+        return output

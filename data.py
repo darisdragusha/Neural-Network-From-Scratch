@@ -31,3 +31,6 @@ batch_size = 16
 nn.train(train_images,epochs,train_labels_one_hot, batch_size,learning_rate)
 
 nn.save_model("trained_model.npz")
+
+test_loss, test_accuracy = nn.evaluate(test_images, test_labels)
+print(f'Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy * 100:.2f}%')
