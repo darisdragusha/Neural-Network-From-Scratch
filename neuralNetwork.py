@@ -7,8 +7,8 @@ class NeuralNetwork:
         self.weights_hidden_output = np.random.randn(hidden_size, output_size) * np.sqrt(1. / hidden_size)
         
         # bias initialization  
-        self.bias_hidden = np.zeros(1, hidden_size)
-        self.bias_output = np.zeros(1,output_size)
+        self.bias_hidden = np.zeros((1, hidden_size))
+        self.bias_output = np.zeros((1,output_size))
 
     def sigmoid_activation_function(self, x):
         return 1/(1+np.exp(-x))
@@ -19,16 +19,16 @@ class NeuralNetwork:
     def leaky_relu_activation_function(self, x, alpha=0.1):
         return np.where(x > 0, x, alpha * x)
     
-    def leaky_relu_derivative(x, alpha=0.01):
+    def leaky_relu_derivative(self, x, alpha=0.01):
         return np.where(x > 0, 1, alpha)
     
-    def softmax_activation_function(x):
+    def softmax_activation_function(self, x):
         exp_x = np.exp(x - np.max(x))  # Subtract max for numerical stability
         return exp_x / exp_x.sum(axis=1, keepdims=True)  # Normalize to get probabilities
     
     def feedforward(self, input_data):
         # hidden layer 
-        self.hidden_layer = np.dot(input_data + self.weights_input_hidden) + self.bias_hidden
+        self.hidden_layer = np.dot(input_data , self.weights_input_hidden) + self.bias_hidden
         self.hidden_layer_activation = self.leaky_relu_activation_function(self.hidden_layer)
 
         #output layer
@@ -84,7 +84,7 @@ class NeuralNetwork:
         self.bias_hidden -= adaptive_lr_input_hidden * self.gradient_bias_hidden
         self.bias_output -= adaptive_lr_hidden_output * self.gradient_bias_output
 
-    def train(self, input_data, epochs,y_true, batch_size, learnin_rate):
+    def train(self, input_data, epochs,y_true, batch_size, learning_rate):
         
         num_samples = input_data.shape[0]
 
@@ -109,6 +109,22 @@ class NeuralNetwork:
                 self.backpass(input_data=X_batch,y_true=y_batch)
 
                 # update weights and biases 
-                self.gradient_descent(learnin_rate)
+                self.gradient_descent(learning_rate)
 
             print(f"Epoch {epoch+1}/{epochs}, Loss: {loss}")
+
+    def save_model(self, filename):
+        """Save the weights and biases to a file."""
+        np.savez(filename,
+                 weights_input_hidden=self.weights_input_hidden,
+                 weights_hidden_output=self.weights_hidden_output,
+                 bias_hidden=self.bias_hidden,
+                 bias_output=self.bias_output)
+
+    def load_model(self, filename):
+        """Load the weights and biases from a file."""
+        data = np.load(filename)
+        self.weights_input_hidden = data['weights_input_hidden']
+        self.weights_hidden_output = data['weights_hidden_output']
+        self.bias_hidden = data['bias_hidden']
+        self.bias_output = data['bias_output']
