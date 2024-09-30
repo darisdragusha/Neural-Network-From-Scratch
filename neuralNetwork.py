@@ -130,14 +130,12 @@ class NeuralNetwork:
         self.bias_output = data['bias_output']
 
     def evaluate(self, test_images, test_labels):
-        # Get predictions for the test set
-        predictions = self.predict(test_images)  # This will return the predicted class indices
+
+        predictions = self.predict(test_images)
 
         # Calculate accuracy
-        accuracy = np.mean(predictions == test_labels)  # Compare predicted classes with true labels
-
-        # Optionally calculate loss if you have a loss function defined
-        # If you're using one-hot encoding for test_labels, ensure to adjust this part
+        accuracy = np.mean(predictions == test_labels)
+        
         test_labels_one_hot = self.one_hot_encode(test_labels, num_classes=10)
         loss = self.cross_entropy_loss(test_labels_one_hot, self.predict_proba(test_images))
 
@@ -146,7 +144,7 @@ class NeuralNetwork:
     def one_hot_encode(self, y, num_classes):
         return np.eye(num_classes)[y]
     def predict(self, X):
-        # Forward pass to get the output probabilities
+
         output = self.feedforward(X)
         # Get the predicted class by finding the index of the maximum value in each output
         predicted_classes = np.argmax(output, axis=1)
