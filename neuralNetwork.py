@@ -6,7 +6,7 @@ class NeuralNetwork:
         self.weights_input_hidden = np.random.randn(input_size, hidden_size) * np.sqrt(1. / input_size)
         self.weights_hidden_output = np.random.randn(hidden_size, output_size) * np.sqrt(1. / hidden_size)
         
-        # bias initialization using 
+        # bias initialization  
         self.bias_hidden = np.zeros(1, hidden_size)
         self.bias_output = np.zeros(1,output_size)
 
@@ -83,3 +83,32 @@ class NeuralNetwork:
         self.weights_input_hidden -= adaptive_lr_input_hidden *self.gradient_weights_input_hidden
         self.bias_hidden -= adaptive_lr_input_hidden * self.gradient_bias_hidden
         self.bias_output -= adaptive_lr_hidden_output * self.gradient_bias_output
+
+    def train(self, input_data, epochs,y_true, batch_size, learnin_rate):
+        
+        num_samples = input_data.shape[0]
+
+        for epoch in range(epochs):
+            # shuffle the data
+            indices = np.arange(num_samples)
+            np.random.shuffle(indices)
+            input_data = input_data[indices]
+            y_true = y_true[indices]
+
+            for i in range(0, num_samples, batch_size):
+                X_batch = input_data[i:i + batch_size]
+                y_batch = y_true[i:i + batch_size]
+
+                # forward pass
+                self.feedforward(input_data=X_batch)
+
+                #calculate loss
+                loss = self.cross_entropy_loss(y_true=y_batch,y_pred=self.output_layer_activation)
+
+                # back pass(calculate gradient)
+                self.backpass(input_data=X_batch,y_true=y_batch)
+
+                # update weights and biases 
+                self.gradient_descent(learnin_rate)
+
+            print(f"Epoch {epoch+1}/{epochs}, Loss: {loss}")
